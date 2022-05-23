@@ -6,6 +6,8 @@
 // Motor steps per revolution. Most steppers are 200 steps or 1.8 degrees/step
 #define MOTOR_STEPS 200
 #define RPM 2
+#define REDUCTION_MOTOR 100
+#define REDUCTION_MOUNT 
 
 // Since microstepping is set externally, make sure this matches the selected mode
 // If it doesn't, the motor will move at a different RPM than chosen
@@ -20,9 +22,10 @@
 // Micros counts up to 4,294,967,295 so we need to check for overflows for long tracking
 // First iteration delay 92308 us
 // Second iteration delay 98120 us
-// Third iteration delay 97638 us    
+// Third iteration delay 97638 us
+// Fourth iteration with a 100:1 planetary gearbos 976us per step    
 // Changing this value will change the rotation speed, a bigger value means a slower speed and vice-versa
-const unsigned long stepDuration = 97638;
+const unsigned long stepDuration = 976;
 unsigned long nextStep = 0;
 const unsigned long microsLimit = 4294967295- stepDuration;
 
@@ -31,6 +34,7 @@ void setup() {
     pinMode(STEP,OUTPUT);
     pinMode(SLEEP,OUTPUT);
 
+    // Enable the stepper driver
     digitalWrite(SLEEP,0);
 
     // Change the rotation direction according to the pole you are in
@@ -43,16 +47,6 @@ void setup() {
 }
 
 void loop() {
-    // Locking version
-    // First try delay 92308 us
-    // Second try delay 98120 us
-    //digitalWrite(STEP,1);
-    //delay(98);
-    //delayMicroseconds(120);
-    //digitalWrite(STEP,0);
-    //delay(98);
-    //delayMicroseconds(120);
-
     // Non blocking with micros() to allow adjustments    
     if (micros() > nextStep)
     {
@@ -68,8 +62,5 @@ void loop() {
 
       // Set next step
       nextStep = nextMicros + stepDuration;
-    
-      
-    }
-    
+    }  
 }
